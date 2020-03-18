@@ -1,4 +1,10 @@
-const { createResponse, getCustomFieldValues, getTaskId, updateTaskIdCustomFields } = require('./helpers.js');
+const {
+  createResponse,
+  getCustomFieldValues,
+  getTaskIdFromCommit,
+  updateTaskIdCustomFields,
+  getBranchName,
+} = require('./helpers.js');
 
 module.exports.tracker = async (event, context, callback) => {
   console.log('Event: ', JSON.stringify(event, null, 2));
@@ -9,12 +15,12 @@ module.exports.tracker = async (event, context, callback) => {
 
   const { ref, commits } = githubBody;
 
-  const branch = ref.split('/')[ref.split('/').length - 1];
+  const branch = getBranchName(ref);
   const updatedTasks = [];
 
   if (validBranches.includes(branch)) {
     commits.forEach(commit => {
-      const id = getTaskId(commit);
+      const id = getTaskIdFromCommit(commit);
 
       if (id) {
         const customFieldValues = getCustomFieldValues(branch);

@@ -27,7 +27,7 @@ module.exports.getCustomFieldValues = branch => {
   }
 };
 
-module.exports.getTaskId = commit => {
+module.exports.getTaskIdFromCommit = commit => {
   const match5OrMoreDigits = /[0-9]{5,}/; // Prevents making request for merge #'s ie "Merge pull request #12...""
   const taskId = commit.message.match(match5OrMoreDigits);
 
@@ -60,3 +60,5 @@ module.exports.updateTaskIdCustomFields = (id, customFieldValues) => {
       return error;
     });
 };
+
+module.exports.getBranchName = ref => ref.split('/')[ref.split('/').length - 1];
