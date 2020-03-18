@@ -6,7 +6,7 @@ const {
   getBranchName,
 } = require('./helpers.js');
 
-module.exports.tracker = async (event, context, callback) => {
+module.exports.updateTask = async (event, context, callback) => {
   console.log('Event: ', JSON.stringify(event, null, 2));
   console.log('event.body', event.body);
   const githubBody = JSON.parse(event.body);
