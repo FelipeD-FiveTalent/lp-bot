@@ -1,0 +1,22 @@
+service: lp-bot
+
+package:
+  exclude:
+    - node_modules/aws-sdk/**/*
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-west-2'}
+  environment:
+    env: ${self:provider.stage}
+
+functions:
+  tracker:
+    handler: src/index.tracker
+    events:
+      - http:
+          path: tracker
+          method: post
+          cors: true
