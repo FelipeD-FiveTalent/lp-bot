@@ -7,10 +7,6 @@ package:
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-west-2'}
-  environment:
-    env: ${self:provider.stage}
 
 functions:
   tracker:
