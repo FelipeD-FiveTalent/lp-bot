@@ -1,7 +1,6 @@
 const axios = require('axios');
 
-const ParseGithubWebhook = require('./parseGithubWebhook');
-const { createResponse } = require('./helpers.js');
+const { createResponse, getCustomFieldValues } = require('./helpers.js');
 
 const { LP_API_BASE_URL, LP_API_TOKEN } = process.env;
 
@@ -25,8 +24,7 @@ module.exports.tracker = async (event, context, callback) => {
 
       if (idChecker) {
         const id = idChecker[0];
-        const parseGithub = new ParseGithubWebhook(branch);
-        const customFieldValues = parseGithub.getcustomFieldValues();
+        const customFieldValues = getCustomFieldValues(branch);
 
         console.log(`Changing Task ID ${id} to: `, customFieldValues);
 
