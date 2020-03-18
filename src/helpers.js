@@ -22,3 +22,14 @@ module.exports.getCustomFieldValues = branch => {
     return { Status: 'Production', Environment: 'Production' };
   }
 };
+
+module.exports.getTaskId = commit => {
+  const match5OrMoreDigits = /[0-9]{5,}/; // Prevents making request for merge #'s ie "Merge pull request #12...""
+  const taskId = commit.message.match(match5OrMoreDigits);
+
+  if (taskId) {
+    return taskId[0];
+  }
+
+  return null;
+};

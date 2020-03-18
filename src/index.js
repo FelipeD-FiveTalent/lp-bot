@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const { createResponse, getCustomFieldValues } = require('./helpers.js');
+const { createResponse, getCustomFieldValues, getTaskId } = require('./helpers.js');
 
 const { LP_API_BASE_URL, LP_API_TOKEN } = process.env;
 
@@ -19,11 +19,10 @@ module.exports.tracker = async (event, context, callback) => {
   if (validBranches.includes(branch)) {
     commits.forEach(commit => {
       console.log('commit: ', commit);
-      const match5OrMoreDigits = /[0-9]{5,}/; // Prevents making request for merge #'s ie "Merge pull request #12...""
-      const idChecker = commit.message.match(match5OrMoreDigits);
 
-      if (idChecker) {
-        const id = idChecker[0];
+      const id = getTaskId(commit);
+
+      if (id) {
         const customFieldValues = getCustomFieldValues(branch);
 
         console.log(`Changing Task ID ${id} to: `, customFieldValues);
