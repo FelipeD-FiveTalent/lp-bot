@@ -15,6 +15,7 @@ module.exports.tracker = async (event, context, callback) => {
   const { ref, commits } = githubBody;
 
   const branch = ref.split('/')[ref.split('/').length - 1];
+  const updatedTasks = [];
 
   if (validBranches.includes(branch)) {
     commits.forEach(commit => {
@@ -41,6 +42,7 @@ module.exports.tracker = async (event, context, callback) => {
           .put(url, postRequestData, postRequestConfig)
           .then(response => {
             console.log(response);
+            updatedTasks.push(response);
           })
           .catch(error => {
             console.log(error);
@@ -49,7 +51,7 @@ module.exports.tracker = async (event, context, callback) => {
     });
   }
 
-  const message = 'Done!!';
+  const message = updatedTasks.length ? { updatedTasks } : 'No tasks were updated';
 
   callback(null, createResponse(200, { message }));
 };
