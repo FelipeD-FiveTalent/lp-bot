@@ -16,7 +16,7 @@ module.exports.getCustomFieldValues = branch => {
     return { Status: 'QA', Environment: 'Testing' };
   }
   if (branch === 'staging') {
-    return { Status: 'Passed - QA', Environment: 'Staging' };
+    return { Status: 'CAT', Environment: 'Staging' };
   }
   if (branch === 'production') {
     return { Status: 'Production', Environment: 'Production' };
