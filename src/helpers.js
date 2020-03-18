@@ -1,3 +1,7 @@
+const axios = require('axios');
+
+const { LP_API_BASE_URL, LP_API_TOKEN } = process.env;
+
 module.exports.createResponse = (statusCode, message) => ({
   statusCode,
   body: JSON.stringify(message, null, 2),
@@ -32,4 +36,27 @@ module.exports.getTaskId = commit => {
   }
 
   return null;
+};
+
+module.exports.updateTaskIdCustomFields = (id, customFieldValues) => {
+  const url = `${LP_API_BASE_URL}/tasks/${id}`;
+  const postRequestData = {
+    task: {
+      custom_field_values: customFieldValues,
+    },
+  };
+  const postRequestConfig = { headers: { Authorization: `Bearer ${LP_API_TOKEN}` } };
+
+  axios
+    .put(url, postRequestData, postRequestConfig)
+    .then(response => {
+      console.log(`Changing Task ID ${id} to: `, customFieldValues);
+
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+
+      return error;
+    });
 };
