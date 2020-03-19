@@ -1,11 +1,12 @@
-const axios = require('axios');
+const {
+  createResponse,
+  getCustomFieldValues,
+  getTaskIdFromCommit,
+  updateTaskIdCustomFields,
+  getBranchName,
+} = require('./helpers.js');
 
-const ParseGithubWebhook = require('./parseGithubWebhook');
-const { createResponse } = require('./helpers.js');
-
-const { LP_API_BASE_URL, LP_API_TOKEN } = process.env;
-
-module.exports.tracker = async (event, context, callback) => {
+module.exports.updateTask = async (event, context, callback) => {
   console.log('Event: ', JSON.stringify(event, null, 2));
   console.log('event.body', event.body);
   const githubBody = JSON.parse(event.body);
@@ -14,42 +15,24 @@ module.exports.tracker = async (event, context, callback) => {
 
   const { ref, commits } = githubBody;
 
-  const branch = ref.split('/')[ref.split('/').length - 1];
+  const branch = getBranchName(ref);
+  const updatedTasks = [];
 
   if (validBranches.includes(branch)) {
     commits.forEach(commit => {
-      console.log('commit: ', commit);
-      const match5OrMoreDigits = /[0-9]{5,}/; // Prevents making request for merge #'s ie "Merge pull request #12...""
-      const idChecker = commit.message.match(match5OrMoreDigits);
+      const id = getTaskIdFromCommit(commit);
 
-      if (idChecker) {
-        const id = idChecker[0];
-        const parseGithub = new ParseGithubWebhook(branch);
-        const customFieldValues = parseGithub.getcustomFieldValues();
+      if (id) {
+        const customFieldValues = getCustomFieldValues(branch);
 
-        console.log(`Changing Task ID ${id} to: `, customFieldValues);
+        const response = updateTaskIdCustomFields(id, customFieldValues);
 
-        const url = `${LP_API_BASE_URL}/tasks/${id}`;
-        const postRequestData = {
-          task: {
-            custom_field_values: customFieldValues,
-          },
-        };
-        const postRequestConfig = { headers: { Authorization: `Bearer ${LP_API_TOKEN}` } };
-
-        axios
-          .put(url, postRequestData, postRequestConfig)
-          .then(response => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        updatedTasks.push(response);
       }
     });
   }
 
-  const message = 'Done!!';
+  const message = updatedTasks.length ? { updatedTasks } : 'No tasks were updated';
 
   callback(null, createResponse(200, { message }));
 };
